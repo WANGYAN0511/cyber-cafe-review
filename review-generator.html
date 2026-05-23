@@ -1,549 +1,296 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>濂借瘎鐢熸垚鍣?路 鏋佽嚧鐢电珵</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
-
-    :root {
-      --bg: #050510;
-      --card: #0d0d24;
-      --card-hover: #12122e;
-      --accent: #00f5ff;
-      --accent2: #7b2fff;
-      --accent3: #ff2d78;
-      --text: #e8e8ff;
-      --text-dim: #8888bb;
-      --border: rgba(0, 245, 255, 0.15);
-      --success: #00e676;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: 'Noto Sans SC', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    .bg-grid {
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: 0;
-    }
-    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
-    .orb-1 { width:400px;height:400px;background:rgba(123,47,255,.18);top:-100px;right:-100px; }
-    .orb-2 { width:350px;height:350px;background:rgba(0,245,255,.12);bottom:-80px;left:-80px; }
-    .orb-3 { width:250px;height:250px;background:rgba(255,45,120,.10);top:50%;left:50%;transform:translate(-50%,-50%); }
-
-    .container { position:relative; z-index:1; max-width:600px; margin:0 auto; padding:24px 16px 60px; }
-
-    /* Header */
-    .header { text-align:center; padding:28px 0 20px; }
-    .logo-bar {
-      display:inline-flex; align-items:center; gap:8px;
-      background:rgba(0,245,255,.06); border:1px solid var(--border);
-      border-radius:50px; padding:6px 16px; margin-bottom:16px;
-    }
-    .logo-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);
-      animation:pulse-dot 2s ease-in-out infinite; }
-    @keyframes pulse-dot {
-      0%,100%{opacity:1;box-shadow:0 0 6px var(--accent);}
-      50%{opacity:.4;box-shadow:none;}
-    }
-    .logo-text { font-size:12px;font-weight:700;letter-spacing:3px;color:var(--accent);text-transform:uppercase; }
-    .header h1 { font-size:24px;font-weight:900;line-height:1.2;
-      background:linear-gradient(135deg,#fff 30%,var(--accent));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px; }
-    .header p { color:var(--text-dim);font-size:13px; }
-
-    /* Stats */
-    .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px; }
-    .stat-item { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center; }
-    .stat-value { font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--accent),#b57fff);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2; }
-    .stat-label { font-size:9px;color:var(--text-dim);margin-top:2px;font-weight:500; }
-
-    /* Platform */
-    .platform-row { display:flex; gap:8px; margin-bottom:14px; }
-    .platform-btn { flex:1;padding:9px;background:var(--card);border:1px solid var(--border);
-      border-radius:10px;color:var(--text-dim);font-family:inherit;font-size:11px;font-weight:700;
-      cursor:pointer;transition:all .2s;text-align:center;user-select:none; }
-    .platform-btn.active { background:rgba(255,45,120,.1);border-color:var(--accent3);color:var(--accent3); }
-
-    /* Style tabs */
-    .tabs { display:flex; gap:8px; margin-bottom:14px; }
-    .tab { flex:1;padding:10px 6px;background:var(--card);border:1px solid var(--border);
-      border-radius:10px;color:var(--text-dim);font-size:12px;font-weight:700;cursor:pointer;
-      transition:all .2s;text-align:center;user-select:none; }
-    .tab.active { background:rgba(0,245,255,.1);border-color:var(--accent);color:var(--accent); }
-
-    /* Review card */
-    .review-card {
-      background:var(--card);border:1px solid var(--border);border-radius:18px;
-      padding:22px 18px;margin-bottom:14px;position:relative;overflow:hidden;
-    }
-    .review-card::before {
-      content:''; position:absolute;top:0;left:0;right:0;height:2px;
-      background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3));
-    }
-    .scan-line { position:absolute;left:0;right:0;height:3px;
-      background:linear-gradient(90deg,transparent,var(--accent),transparent);pointer-events:none;z-index:10; }
-    @keyframes scan { 0%{top:-5%;opacity:.8;} 100%{top:105%;opacity:0;} }
-    .review-card.scanning .scan-line { animation:scan .55s ease-out forwards; }
-
-    .specs-grid { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px; }
-    .spec-chip { background:rgba(123,47,255,.12);border:1px solid rgba(123,47,255,.3);
-      border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:#b57fff;white-space:nowrap; }
-
-    .review-text { font-size:14.5px;line-height:1.85;color:#d8d8f0;white-space:pre-wrap;min-height:180px;word-break:break-word; }
-
-    .gen-count { text-align:center;margin-top:12px;font-size:11px;color:var(--text-dim); }
-    .gen-count span { color:var(--accent);font-weight:700; }
-
-    /* Buttons */
-    .btn-row { display:flex;gap:10px;margin-bottom:14px; }
-    .action-btn {
-      flex:1;padding:15px;border:none;border-radius:14px;color:#fff;
-      font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;display:flex;
-      align-items:center;justify-content:center;gap:7px;transition:all .25s;letter-spacing:1px;
-      position:relative;overflow:hidden;
-    }
-    .action-btn::after {
-      content:'';position:absolute;inset:0;
-      background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15) 60%, transparent 80%);
-      transform:translateX(-100%);transition:transform .5s;
-    }
-    .action-btn:hover::after { transform:translateX(100%); }
-    .action-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,245,255,.25); }
-    .action-btn:active { transform:translateY(0); }
-
-    .refresh-btn { background:linear-gradient(135deg,#333,#444);border:1px solid rgba(255,255,255,.1);color:#ccc; }
-    .refresh-btn:hover { box-shadow:0 8px 30px rgba(255,255,255,.1); }
-    .copy-btn { background:linear-gradient(135deg,var(--accent2),var(--accent)); }
-    .copy-btn:hover { box-shadow:0 8px 30px rgba(0,245,255,.35); }
-    .copy-btn.copied { background:linear-gradient(135deg,#00c853,#00e676); }
-
-    /* Toast */
-    .toast {
-      position:fixed;bottom:32px;left:50%;
-      transform:translateX(-50%) translateY(80px);
-      background:#1a1a3a;border:1px solid var(--accent);border-radius:12px;
-      padding:12px 24px;font-size:14px;font-weight:700;color:var(--accent);
-      z-index:1000;transition:transform .35s cubic-bezier(.34,1.56,.64,1);
-      white-space:nowrap;box-shadow:0 4px 30px rgba(0,245,255,.2);
-    }
-    .toast.show { transform:translateX(-50%) translateY(0); }
-
-    .footer { text-align:center;padding:16px 0;color:var(--text-dim);font-size:10px; }
-
-    /* Refresh spin */
-    @keyframes spin { to{transform:rotate(360deg);} }
-    .spinning svg { animation:spin .5s linear; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>电竞好评生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:#0d1117;color:#c9d1d9;min-height:100vh;
+  overflow-x:hidden;
+}
+.wrap{max-width:440px;margin:0 auto;padding:20px 16px 60px}
+.header{text-align:center;padding:24px 0 20px}
+.header h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,#58a6ff,#3fb950);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .sub{color:#6e7681;font-size:13px;margin-top:6px}
+.tabs{display:flex;gap:10px;margin-bottom:18px}
+.tab{flex:1;text-align:center;padding:11px 4px;border-radius:10px;font-size:14px;font-weight:600;
+  border:1px solid #21262d;background:#161b22;color:#8b949e;cursor:pointer;transition:.2s}
+.tab.on{border-color:#238636;background:#0d2818;color:#3fb950}
+.tab.blue.on{border-color:#0969da;background:#052a48;color:#58a6ff}
+.output{
+  background:#161b22;border:1px solid #21262d;border-radius:14px;
+  padding:18px 16px;margin-bottom:18px;min-height:170px;position:relative
+}
+.output textarea{
+  width:100%;min-height:140px;background:transparent;border:none;
+  color:#e6edf3;font-size:15px;line-height:1.85;resize:none;outline:none;
+  font-family:inherit;
+}
+.output textarea::placeholder{color:#484f58}
+.badge{position:absolute;top:10px;right:12px;font-size:11px;color:#484f58}
+.btns{display:flex;gap:12px;margin-bottom:18px}
+.btn{flex:1;padding:14px 0;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-gen{background:#161b22;color:#58a6ff;border:1px solid #0969da}
+.btn-gen:active{background:#052a48}
+.btn-copy{background:#238636;color:#fff}
+.btn-copy:active{background:#196c2e}
+.btn-copy.done{background:#bf8700;color:#fff}
+.tip{text-align:center;color:#484f58;font-size:12px;line-height:1.7}
+.foot{text-align:center;color:#30363d;font-size:11px;margin-top:24px}
+</style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
-<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
-
-<div class="container">
-
+<div class="wrap">
   <div class="header">
-    <div class="logo-bar"><div class="logo-dot"></div><span class="logo-text">濂借瘎鐢熸垚鍣?/span></div>
-    <h1>涓€閿敓鎴?路 姣忔涓嶅悓</h1>
-    <p>姣忔鍒锋柊閮芥槸鍏ㄦ柊璇勪环锛屽憡鍒崈绡囦竴寰?/p>
+    <h1>🎮 电竞好评生成器</h1>
+    <p class="sub">高端配置 · 一键生成 · 随心复制</p>
   </div>
 
-  <div class="stats-bar">
-    <div class="stat-item"><div class="stat-value">5090D</div><div class="stat-label">椤剁骇鏄惧崱</div></div>
-    <div class="stat-item"><div class="stat-value">9950X3D</div><div class="stat-label">鏃楄埌CPU</div></div>
-    <div class="stat-item"><div class="stat-value">720Hz</div><div class="stat-label">鐢电珵灞?/div></div>
-    <div class="stat-item"><div class="stat-value">GPW3</div><div class="stat-label">鏃楄埌榧犳爣</div></div>
+  <div class="tabs" id="styleTabs">
+    <div class="tab on" data-s="rich">🌟 丰富版</div>
+    <div class="tab blue" data-s="casual">😎 随意版</div>
+    <div class="tab blue" data-s="short">⚡ 简短版</div>
   </div>
 
-  <div class="platform-row">
-    <button class="platform-btn active" data-platform="dianping">澶т紬鐐硅瘎</button>
-    <button class="platform-btn" data-platform="meituan">缇庡洟</button>
-    <button class="platform-btn" data-platform="other">鍏朵粬骞冲彴</button>
+  <div class="output">
+    <span class="badge" id="cnt">已生成 0 条</span>
+    <textarea id="out" readonly placeholder="点击下方按钮生成好评文案..."></textarea>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-style="rich">涓板瘜鐗?/button>
-    <button class="tab" data-style="casual">闅忔剰鐗?/button>
-    <button class="tab" data-style="short">绠€鐭増</button>
+  <div class="btns">
+    <button class="btn btn-gen" onclick="gen()">🔄 换一条</button>
+    <button class="btn btn-copy" id="cpBtn" onclick="doCopy()">📋 一键复制</button>
   </div>
 
-  <div class="review-card" id="reviewCard"><div class="scan-line"></div>
-    <div class="specs-grid" id="specsGrid">
-      <span class="spec-chip">RTX 5090D</span>
-      <span class="spec-chip">9950X3D</span>
-      <span class="spec-chip">720Hz 灞?/span>
-      <span class="spec-chip">缃楁妧 GPW3</span>
-    </div>
-    <div class="review-text" id="reviewText"></div>
-    <div class="gen-count" id="genCount">宸茬敓鎴?<span>0</span> 鏉′笉閲嶅璇勪环</div>
-  </div>
-
-  <div class="btn-row">
-    <button class="action-btn refresh-btn" id="refreshBtn" onclick="generateReview()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-      鍒锋柊璇勪环
-    </button>
-    <button class="action-btn copy-btn" id="copyBtn" onclick="copyReview()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      涓€閿鍒?    </button>
-  </div>
-
-  <div class="footer">鏋佽嚧鐢电珵棣?路 濂借瘎鐢熸垚宸ュ叿</div>
+  <p class="tip">💡 选风格 → 点换一条 → 满意后点复制 → 粘贴到点评App</p>
+  <p class="foot">RTX 5070~5090D · AMD X3D · 卓威/ROG 高端屏</p>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// ============================================================
-// 绱犳潗搴?鈥?姣忎釜缁村害鐨勭嫭绔嬪彞瀛?娈佃惤锛岄殢鏈虹粍鍚?// ============================================================
+// ===== 素材库（参考真实用户评价语感）=====
+var D = {
+  cpu: ['7800X3D','9800X3D','9950X3D'],
+  gpu: ['RTX 5070','RTX 5080','RTX 5090D'],
+  mon: ['卓威600Hz电竞屏','ROG 2K 540Hz','ROG 4K 720Hz'],
+  mou: ['罗技GPW3代'],
 
-const DB = {
-
-  // 寮€澶撮挬瀛愶紙鍚稿紩鐪肩悆锛?  openers: [
-    "杩欏缃戝惂鐪熺殑鍒锋柊浜嗘垜瀵广€岀數绔為銆嶄笁涓瓧鐨勮鐭?,
-    "浣滀负涓€涓€佺綉鐦惧皯骞达紝鍘昏繃鍑犲崄瀹剁綉鍚т簡锛岃繖瀹跺繀椤绘帓鍓嶄笁",
-    "琚湅鍙嬪畨鍒╂潵鐨勶紝鏉ヤ簡涔嬪悗鍙戠幇鐪熺殑娌¤俯闆?,
-    "绗竴娆℃潵杩欏搴楋紝浣撻獙鎰熺洿鎺ユ媺婊?,
-    "鏈潵鍙兂鎵撲袱鎶婂氨璧帮紝缁撴灉涓€鍧愬氨鏄竴涓嬪崍",
-    "杩欓厤缃€佽繖鐜銆佽繖鏈嶅姟锛岃瀹炶瘽姣斿緢澶氫竴绾垮煄甯傜殑鐢电珵棣嗛兘寮?,
-    "鍛ㄦ湯璺熸湅鍙嬬害鐫€鏉ュ紑榛戯紝閫夎繖瀹剁湡鐨勯€夊浜?,
-    "涔嬪墠鍦ㄥ埆瀹舵墦杩囷紝瀵规瘮涓嬫潵宸窛澶槑鏄句簡",
-    "璺繃杩涙潵璇曡瘯锛岀粨鏋滆绉嶈崏浜?,
-    "鍐茬潃楂橀厤鏈哄櫒鏉ョ殑锛屽疄闄呬綋楠岃秴鍑洪鏈?,
-    "鏈嬪弸璇磋繖瀹剁綉鍚ч厤缃ぉ鑺辨澘锛屼粖澶╂潵楠岃瘉浜嗕竴涓嬶紝纭疄鐗?,
-    "鍦ㄩ檮杩戝姙浜嬮『渚挎潵鎵撲袱鎶婏紝娌℃兂鍒板彂鐜颁簡瀹濊棌搴楅摵",
-    "鐪嬩簡涓嬪ぇ浼楃偣璇勮瘎鍒嗗緢楂橈紝鎶辩潃璇曡瘯鐨勫績鎬佹潵锛岀粨鏋滅湡棣?,
-    "宸茬粡鏉ヨ繃濂藉嚑娆′簡锛屾瘡娆′綋楠岄兘寰堢ǔ瀹?,
-    "鏂板紑鐨勭數绔為锛岃澶囧叏鏂帮紝浣撻獙鎰熸媺婊?,
+  // 开头（真实用户口吻）
+  open: [
+    '今天跟朋友过来打卡这家网咖','周末约了队友开黑，选了这家','刷到这家店评价不错，今天特意来试试',
+    '在这家网咖待了一下午','朋友安利我来这家，果然没踩雷','这家我刷抖音看到好几次了，今天终于来打卡',
+    '路过进来试了一下，结果超预期了','本来只是想玩两小时，结果待了一整天',
+    '这家网咖在我们这评价一直很高，今天来亲测','听队友说这家配置很顶，今天来感受一下'
   ],
 
-  // 鏄惧崱鎻忚堪
-  gpu: [
-    "鏄惧崱鏄?RTX 5070 璧锋锛岄《閰嶇洿鎺ヤ笂鍒?5090D锛岃窇銆婇粦绁炶瘽銆嬨€婅禌鍗氭湅鍏?077銆嬭繖绉嶅ぇ浣滅壒鏁堝叏寮€甯ф暟绋冲娉板北锛岀敾闈㈡祦鐣呭緱鍍忓湪鐪嬬數褰?,
-    "RTX 5090D 鐨勬満鍣ㄦ垜璇曚簡锛屽厜杩藉叏寮€璺?3A 澶т綔瀹屽叏娌″帇鍔涳紝甯ф暟闅忎究鐮寸櫨锛岄偅绉嶄笣婊戞劅鍙湁浜茶嚜涓婃墜鎵嶈兘浣撲細",
-    "鏄惧崱閰嶇疆鐪熺殑寰堥《锛?070 鍒?5090D 澶氭。鍙€夛紝涓嶇浣犳槸鎵?FPS 杩樻槸鐜?3A 澶т綔閮借兘鎵惧埌鍚堥€傜殑閰嶇疆",
-    "5090D + DLSS 寮€鍚悗锛?K 鍒嗚鲸鐜囦笅甯ф暟渚濈劧璧烽锛岃繖绉嶆€ц兘閲婃斁鍔涘湪鍚屼环浣嶇綉鍚ч噷鍩烘湰鎵句笉鍒板鎵?,
-    "瀹炴祴浜嗕竴涓?5090D 鏈哄櫒锛屻€婅壘灏旂櫥娉曠幆銆嬫渶楂樼敾璐ㄧǔ瀹?120 甯?锛屾樉鍗℃俯搴︽帶鍒朵篃寰堜紭绉€锛屾暎鐑仛寰椾笉閿?,
-    "鏄惧崱浠?5070 璧锋杩欎釜瀹氫綅灏卞緢鑹績浜嗭紝寰堝缃戝惂杩樺湪鐢?40 绯诲垪锛岃繖閲岀洿鎺ヤ笂 50 绯诲垪鏂板崱",
+  // 环境描述（真实语感）
+  env: [
+    '一进门就感觉不一样，装修很有科技感，灯带效果拉满',
+    '环境比我想象中好太多，干净整洁，完全没有那种乌烟瘴气的感觉',
+    '装修风格很带感，简约又不失科技感，拍照发朋友圈超有面',
+    '空气清新，通风做得很好，坐一天也不会闷',
+    '位置很宽敞，椅子是可以调节的电竞椅，坐着腰不酸',
+    '整体环境很安静，大家都在认真玩，氛围特别好',
+    '卫生做得真到位，键盘鼠标都挺新的，桌面也没有油渍',
+    '包间隔音效果还可以，跟朋友开麦也不会互相干扰'
   ],
 
-  // CPU 鎻忚堪
-  cpu: [
-    "CPU 闃靛鏄?7800X3D / 9800X3D / 9950X3D 涓夋。鍙€夛紝X3D 绯诲垪鐨勫ぇ缂撳瓨瀵规父鎴忓抚鏁版彁鍗囬潪甯告槑鏄撅紝灏ゅ叾鏄綉娓稿満鏅?,
-    "9950X3D 杩欓 U 鎵撴父鎴忕畝鐩存槸闄嶇淮鎵撳嚮锛岄厤鍚?5090D 鍩烘湰涓婄洰鍓嶅競闈笂娌℃湁浠讳綍娓告垙鑳介毦鍊掑畠",
-    "AMD X3D 绯诲垪澶勭悊鍣ㄦ墦娓告垙鏄湡鐨勯锛屽ぇ缂撳瓨璁捐璁╂父鎴忔渶浣庡抚鍜?1% Low 甯ч兘鐗瑰埆绋筹紝涓嶄細鍑虹幇绐佺劧鎺夊抚鐨勬儏鍐?,
-    "CPU 缁欏埌浜?9950X3D 杩欎釜绾у埆锛岃瀹炶瘽寰堝瀹剁敤鐢佃剳閮芥病杩欓厤缃紝鍦ㄨ繖閲屾墦娓告垙鐪熺殑鏄韩鍙?,
-    "7800X3D 鎬т环姣旇秴楂橈紝9800X3D 鍧囪　涔嬮€夛紝9950X3D 鐩存帴鎷夋弧锛屼笁妗ｉ厤缃鐩栦簡涓嶅悓棰勭畻鐨勯渶姹?,
+  // 硬件体验（具体、有细节）
+  hw: [
+    '的配置真的没话说，跑全程帧数稳得一批，完全没有掉帧的情况',
+    '配，这组合在网吧里真的算顶配了，玩画质拉满也丝滑',
+    '的显示器效果太细腻了，打FPS定位精准，感觉自己变强了',
+    '的鼠标手感超好，微动清脆，打了一个下午手也不累',
+    '显卡跑，这帧数简直是降维打击，画质全开无压力',
+    'CPU是，多开也不卡，切换游戏速度飞快',
+    '屏幕是，240Hz以上刷新率，玩FPS那种丝滑感真的回不去了'
   ],
 
-  // 鏄剧ず鍣ㄦ弿杩?  monitor: [
-    "鏄剧ず鍣ㄦ槸閲嶅ご鎴忊€斺€斿崜濞?600Hz銆丷OG 2K 540Hz銆丷OG 1K 720Hz 涓夌瑙勬牸锛孎PS 鐜╁鐙傚枩锛?20Hz 鐨勫埛鏂扮巼鎵?CS2/鐡︾綏鍏扮壒绠€鐩村紑浜嗙墿鐞嗗鎸?,
-    "720Hz 鐨勬樉绀哄櫒绗竴娆＄敤锛岄偅绉嶆祦鐣呮劅璺?144Hz 瀹屽叏鏄袱涓笘鐣岋紝鏁屼汉绉诲姩杞ㄨ抗鐪嬪緱娓呮竻妤氭锛岀瀯鍑嗙簿鍑嗗害鎻愬崌鏄庢樉",
-    "鍗撳▉鐨?600Hz 灞忚壊褰╄繕鍘熷害寰堝ソ锛孯OG 鐨?540Hz 2K 灞忓吋椤剧敾璐ㄥ拰娴佺晠搴︼紝鏍规嵁鑷繁鎵撶殑 game 閫夊氨琛?,
-    "鏄剧ず鍣ㄨ繖鍧楃湡鐨勪笅浜嗚鏈紝720Hz 楂樺埛灞忓湪鍚屽煄缃戝惂閲屽簲璇ユ槸鐙竴浠界殑瀛樺湪锛岃亴涓氶€夋墜璁粌绾у埆鐨勯厤缃?,
-    "灞忓箷绱犺川寰堟锛屼笉绠℃槸 FPS 杩樻槸 MOBA 鎴栬€?3A 澶т綔閮芥湁瀵瑰簲鐨勬渶浣虫樉绀烘柟妗堬紝杩欑偣寰堢敤蹇?,
+  // 网络/游戏体验
+  net: [
+    '网速飞快，延迟低到感觉不到，打排位从来没卡过',
+    '千兆光纤不是吹的，下载速度拉满，游戏更新秒完成',
+    'Wi-Fi速度也很给力，手机连上刷视频也不卡',
+    '开黑打瓦完全没有延迟，跟队友配合行云流水',
+    '这网速比我家宽带快多了，根本不用担心掉线掉包'
   ],
 
-  // 澶栬鎻忚堪
-  peripheral: [
-    "鍏ㄥ満鏍囬厤缃楁妧 GPW3 浠ｆ棗鑸伴紶鏍囷紝杩欐榧犳爣閲嶉噺杞汇€佷紶鎰熷櫒绮惧噯锛岄暱鏃堕棿鎵撴父鎴忔墜鑵曚篃涓嶇疮锛屾墜鎰熺‘瀹為《绾?,
-    "GPW3 鏄洰鍓嶈亴涓氳禌鍦哄嚭鍦虹巼鏈€楂樼殑榧犳爣涔嬩竴锛岃繖閲屽叏鍦烘爣閰嶈鏄庤€佹澘鏄湡鎳傜帺瀹堕渶姹?,
-    "榧犳爣鏄?GPW3锛岄敭鐩樹篃鏄満姊拌酱浣擄紝鎸夐敭鍙嶉娓呰剢锛屾暣浣撳璁炬按骞宠繙瓒呮櫘閫氱綉鍚?,
-    "澶栬杩欏潡娌℃湁缂╂按锛孏PW3 榧犳爣 + 鏈烘閿洏 + 浜轰綋宸ュ妞咃紝涓€濂椾笅鏉ユ瘮鑷繁鍦ㄥ閰嶈繕鍒掔畻",
-    "鐢ㄤ簡 GPW3 涔嬪悗鎰熻浠ュ墠鐢ㄧ殑榧犳爣閮芥槸鍨冨溇锛岃交閲忓寲璁捐 + Hero 2 浼犳劅鍣紝鎸囧摢鎵撳摢涓嶆槸鍚圭殑",
+  // 服务/餐饮
+  svc: [
+    '前台小姐姐态度超好，办理上机很快，还主动介绍套餐',
+    '送餐速度挺快的，点了份小吃，没一会儿就送到了',
+    '老板人很热情，还送了饮料，这种服务态度必须好评',
+    '桌面呼叫器响应很快，有需求按一下服务员马上过来',
+    '会员价格很实惠，还送了小时券，算下来性价比真的高',
+    '空调温度刚好，不会冷到发抖也不会热得出汗，细节到位'
   ],
 
-  // 鐜/姘涘洿
-  environment: [
-    "鐜鏂归潰鐏厜璁捐寰堟湁璧涘崥鏈嬪厠鐨勬劅瑙夛紝RGB 姘涘洿鐏甫浣嗕笉鍒虹溂锛屾墦璧锋父鎴忔潵娌夋蹈鎰熷緢寮?,
-    "搴т綅闂磋窛澶熷锛屼笉浼氬儚鏈変簺缃戝惂鎸ゅ緱闅惧彈锛屾矙鍙戞鍧愮潃鑸掓湇锛岃繛鍧愬嚑涓皬鏃惰叞閮戒笉閰?,
-    "绌鸿皟缁欏姏锛屽澶╄繘鏉ュ噳蹇緱寰堬紝鍐ぉ鏆栨皵涔熻冻锛屾俯搴︽帶鍒跺垰鍒氬ソ",
-    "鍗敓鎵撴壂寰楀緢骞插噣锛屾闈㈡病鏈夋补娓嶇儫鐏帮紝鍘曟墍涔熸病鏈夊紓鍛筹紝杩欑偣瀵圭綉鍚ф潵璇村お闅惧緱浜?,
-    "鏁翠綋瑁呬慨椋庢牸鍋忕鎶€鎰燂紝娣辫壊璋冧负涓婚厤涓婇湏铏圭伅鏁堬紝鎷嶇収鍙戞湅鍙嬪湀閮藉ソ鐪?,
-    "闅旈煶鏁堟灉涓嶉敊锛屼笉浼氳闅斿鍚靛埌锛屾瘡涓汉鏈夎嚜宸辩殑灏忕┖闂达紝绉佸瘑鎬у緢濂?,
-    "缃戦€熼蹇紝涓嬭浇娓告垙鍑犲垎閽熷氨鎼炲畾锛屽湪绾跨湅瑙嗛銆佺洿鎾畬鍏ㄤ笉鍗￠】",
-    "楗枡闆堕绉嶇被澶氾紝浠锋牸涔熷悎鐞嗭紝涓嶇敤鑷繁甯︿笢瑗胯繃鏉ワ紝楗夸簡闅忔椂鑳界偣",
+  // 性价比
+  price: [
+    '这个配置这个价格真的良心，比我家那边同配置的网吧便宜多了',
+    '会员价算下来每小时才几块钱，学生党表示毫无压力',
+    '团购套餐很划算，还送饮料小吃，感觉老板在做慈善',
+    '这个地段这个配置，价格真的很亲民了，长期囤小时券那种',
+    '性价比真的高，同等配置在其他地方至少要贵个50%'
   ],
 
-  // 鏈嶅姟鎻忚堪
-  service: [
-    "搴楀憳鏈嶅姟鎬佸害鐗瑰埆濂斤紝鏈夋眰蹇呭簲锛屾崲榧犳爣鍨€佽皟鏄剧ず鍣ㄣ€佸府蹇欓噸鍚粈涔堢殑鍝嶅簲寰堝揩",
-    "鍓嶅彴灏忓濮?灏忓摜鍝ュ緢鐑儏锛岃繘闂ㄥ氨寮曞閫夊骇锛岃繕浼氫富鍔ㄩ棶闇€瑕佷粈涔堝府鍔?,
-    "閬囧埌鎶€鏈棶棰樺枈涓€澹板氨鏈変汉鏉ュ鐞嗭紝涓嶅儚鏈夌殑缃戝惂鍠婂崐澶╂病浜虹悊",
-    "鍏呭€间細鍛樿繕鏈変紭鎯犳椿鍔紝鎬т环姣旀尯楂樼殑锛岀粡甯告潵鎵撶殑璇濆姙寮犲崱寰堝垝绠?,
-    "搴楅噷杩樻彁渚涘厖鐢电嚎銆佽€虫満绛夊€熺敤鏈嶅姟锛屽繕甯︿笢瑗夸篃涓嶇敤鎱?,
-    "澶滃鏃舵杩樻湁鐗逛环濂楅锛屾墦鍒板崐澶滈タ浜嗙洿鎺ョ偣涓€浠斤紝寰堟柟渚?,
+  // 结尾推荐（真实用户语气）
+  end: [
+    '强烈推荐给各位打瓦/吃鸡的兄弟，这配置真的香',
+    '必须五星好评，已经收藏了，下周还来',
+    '安利给所有电竞爱好者，这才是网吧该有的样子',
+    '队友问我今天在哪打的，我已经把地址发群里了',
+    '真心推荐，来过的都说好，不信你自己来试一次',
+    '五星好评走起，这种店值得让更多人知道',
+    '已经是回头客了，这家我会长期支持的',
+    '建议大家来试试，特别是对环境有要求的，这家绝对符合你预期'
   ],
 
-  // 娓告垙浣撻獙
-  gaming: [
-    "鎵撲簡鍑犱釜灏忔椂銆婃棤鐣忓绾︺€嬶紝鏋硶鎰熻閮芥瘮骞虫椂鍑嗕簡涓嶅皯锛岄珮鍒峰睆 + 浣庡欢杩熺殑缁勫悎纭疄鎻愬崌宸ㄥぇ",
-    "璺熸湅鍙嬩簲榛戝紑浜嗕竴鎶婂張涓€鎶婏紝璇煶娓呮櫚涓嶅崱椤匡紝鍥㈤槦閰嶅悎璧锋潵鐗瑰埆鐖?,
-    "鍗曟満鍏氱闊筹紝Steam 搴撻噷鐨勬父鎴忕粓浜庡彲浠ユ弧鐗规晥杩愯浜嗭紝涔嬪墠鍦ㄥ鐢佃剳鏍规湰甯︿笉鍔?,
-    "LOL 鍥㈡垬鎶€鑳戒贡椋炵殑鏃跺€欏抚鏁颁緷鐒剁ǔ瀹氾紝鍐嶄篃涓嶆€曞叧閿椂鍒绘帀甯у潙闃熷弸浜?,
-    "鍚冮浮鍐宠禌鍦?1v1 瀵规灙鐨勬椂鍊欙紝720Hz 灞忕殑浼樺娍浣撶幇寰楁穻婕撳敖鑷达紝鍙嶅簲閫熷害鎷夋弧",
-    "涓嬩簡鍑犱釜鎯崇帺寰堜箙浣嗗閲岀數鑴戣窇涓嶅姩鐨勫ぇ浣滐紝缁堜簬鍙互濂藉ソ浣撻獙鍓ф儏浜?,
-  ],
-
-  // 缁撳熬鎬荤粨
-  closers: [
-    "鎬讳箣锛岃繖瀹跺簵鏃犺鏄‖浠堕厤缃繕鏄蒋浠舵湇鍔￠兘鍦ㄧ嚎锛屼簲鏄熸帹鑽愶紝涓嬫杩樻潵锛?,
-    "缁煎悎浣撻獙婊″垎锛屽凡缁忓姞鍏ユ垜鐨勫父椹诲垪琛ㄤ簡锛屼互鍚庢墦娓告垙灏辫鍑嗚繖瀹?,
-    "鐪熷績鎺ㄨ崘缁欐墍鏈夌埍鎵撴父鎴忕殑鏈嬪弸锛屾潵涓€娆′綘灏辩煡閬撳樊璺濅簡",
-    "鎬т环姣斻€侀厤缃€佺幆澧冦€佹湇鍔″叏鏂逛綅鍦ㄧ嚎锛岃繖瀹跺簵鍊煎緱涓€涓簲鏄熷ソ璇?,
-    "濡傛灉浣犱篃鍦ㄦ壘涓€瀹堕潬璋辩殑鐢电珵棣嗭紝杩欏缁濆鍊煎緱鏉ヨ瘯璇?,
-    "鎵撳畬杩欎竴娉㈠凡缁忓喅瀹氬姙浼氬憳浜嗭紝浠ュ悗杩欏氨鏄垜鐨勫揩涔愯€佸",
-    "涓嶅璇翠簡锛屾噦鐨勮嚜鐒舵噦锛屼笉鎳傜殑鏉ヤ綋楠屼竴娆″氨鏄庣櫧浜?,
-    "鎬荤粨涓€鍙ヨ瘽锛氶厤缃ぉ鑺辨澘 + 鏈嶅姟鍒颁綅 + 鐜鑸掗€?= 鐢电珵鐜╁鐨勭悊鎯虫嵁鐐?,
-    "宸茬粡鎺ㄨ崘缁欐父鎴忕兢鐨勬湅鍙嬩簡锛屼笅娆＄粍鍥㈠啀鏉?,
-    "鍐欒繖涔堝灏辨槸涓轰簡鍛婅瘔澶у锛氳繖瀹跺簵锛屽€煎緱锛?,
-  ],
-
-  // 绠€鐭増妯℃澘锛堟暣鍙ワ級
-  shortTemplates: [
-    "RTX 5090D + 9950X3D + 720Hz 鐢电珵灞?+ GPW3 榧犳爣锛岄厤缃媺婊°€傜幆澧冨共鍑€鑸掗€傦紝绌鸿皟瓒筹紝鏈嶅姟鐑儏锛屼簲鏄熸帹鑽愶紒",
-    "璁惧椤剁骇锛?090D 璺?3A 澶т綔姣棤鍘嬪姏锛?20Hz 灞忔墦 FPS 澶埥浜嗐€傚崼鐢熷共鍑€锛屽簵鍛樺搷搴斿揩锛屾€т环姣旇秴楂樸€?,
-    "琚湅鍙嬪畨鍒╂潵鐨勶紝鏋滅劧娌¤俯闆枫€?090D + 9950X3D 鐨勬満鍣ㄤ笣婊戝埌椋炶捣锛孏PW3 鎵嬫劅缁濅簡锛岀幆澧冧篃濂姐€?,
-    "杩欏缃戝惂閰嶇疆鐪熺殑椤讹紝5070 璧?5090D 灏侀《锛屾樉绀哄櫒鏈€楂?720Hz锛屽叏鍦?GPW3銆傜幆澧冩湇鍔￠兘鍦ㄧ嚎锛屽己鐑堟帹鑽愩€?,
-    "浣撻獙鎰熸媺婊★紒5090D 鏈哄櫒璺戜簡鎶婇粦绁炶瘽锛岀壒鏁堝叏寮€甯ф暟鐮寸櫨銆傚骇妞呰垝鏈嶇┖璋冭冻锛屾墦浜嗕竴涓嬪崍涓嶆兂璧般€?,
-    "鍚屼环浣嶉噷閰嶇疆鏈€鐚涚殑涓€瀹讹紝9950X3D + 5090D + 720Hz 灞忥紝澶栬鍏ㄦ槸鏃楄埌娆俱€傜幆澧冨崼鐢熸湇鍔℃€佸害閮芥病姣涚梾銆?,
-    "鏉ヨ繃寰堝瀹剁綉鍚э紝杩欏缁煎悎浣撻獙鑳芥帓鍓嶄笁銆傜‖浠堕厤缃ぉ鑺辨澘绾у埆锛岀幆澧冭禌鍗氶锛屾湇鍔′篃鍒颁綅銆?,
-    "鍛ㄦ湯璺熸湅鍙嬫潵寮€榛戠殑锛屽ぇ瀹朵竴鑷磋涓鸿繖瀹舵槸鐩墠鎵撹繃鏈€濂界殑銆?090D + 720Hz锛孎PS 鐜╁鐨勫ぉ鍫傘€?,
-    "璁惧鍏ㄦ柊閰嶇疆楂橈紝5090D + X3D 绯诲垪 CPU + 楂樺埛灞忥紝鎵撴父鎴忎笣婊戞祦鐣呫€備綅缃ソ鎵惧仠杞︽柟渚匡紝浜旀槦濂借瘎銆?,
-    "鍐茬潃楂橀厤鏉ョ殑锛?090D 鏈哄櫒鏋滅劧鍚嶄笉铏氫紶銆侴PW3 榧犳爣 + 720Hz 灞忓箷缁勫悎锛屾墦 CS2 鐖藉埌椋炶捣銆?,
-  ],
-
-  // 闅忔剰鐗堝紑澶?  casualOpeners: [
-    "璇磋浠婂ぉ鐨勪綋楠屽惂鈥斺€?,
-    "绠€鍗曡瘎浠蜂竴涓嬶細",
-    "鏉ユ墦涓垎锛?,
-    "鎰熷彈鍒嗕韩锛?,
-    "鐪熷疄浣撻獙鎶ュ憡锛?,
-    "涓嶅惞涓嶉粦锛岃璇磋繖瀹跺簵锛?,
-    "绾矾浜虹湡瀹炴劅鍙楋細",
-    "鍒氭墦瀹屽嚑鎶婏紝鏉ヨ璇达細",
-    "浣撻獙瀹屾潵鐣欎釜瑷€锛?,
-    "缁欏悗鏉ヤ汉鍋氫釜鍙傝€冿細",
-  ],
+  // 简短版素材
+  short: [
+    '配置顶，环境好，网速快，强烈推荐！',
+    '这配置没得说，打游戏丝滑到飞起，五星！',
+    '环境干净，服务到位，性价比超高，下次还来！',
+    '高端配置，价格实惠，已经推荐给队友了！',
+    '来这家网吧上网是一种享受，配置顶配，环境一流！',
+    '空调给力，网速飞快，座位舒服，完美！',
+    '这家网咖真的绝，配置高，环境好，老板人也好！',
+    '五星好评！配置、环境、服务全部在线，没毛病！'
+  ]
 };
 
-// ============================================================
-// 宸ュ叿鍑芥暟
-// ============================================================
+function R(a){ return a[Math.random()*a.length|0] }
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+var cnt = 0, hist = [], MAX = 200;
 
-function pickN(arr, n) {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, n);
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-let genTotal = 0;
-const history = new Set();
-let currentStyle = 'rich';
-
-// ============================================================
-// 鐢熸垚鍣?// ============================================================
-
-function generateRich() {
-  const parts = [];
-
-  // 寮€澶?  parts.push(pick(DB.openers));
-
-  // 闅忔満閫?2-3 涓‖浠剁淮搴﹁缁嗗睍寮€
-  const hwPool = shuffle(['gpu', 'cpu', 'monitor', 'peripheral']);
-  const hwCount = 2 + Math.floor(Math.random() * 2); // 2 or 3
-  for (let i = 0; i < hwCount; i++) {
-    parts.push(pick(DB[hwPool[i]]));
+// ===== 丰富版模板（15条，完整真实语感）=====
+var RICH = [
+  function(){
+    return R(D.open)+'，'+R(D.env)+'。硬件方面，'+R(D.cpu)+R(D.gpu)+R(D.hw).replace('的配置','配置')+'。'+R(D.mon)+'的显示效果真的细腻，'+R(D.mou)+'手感也超好。'+R(D.net)+'。'+R(D.svc)+'。'+R(D.price)+'。'+R(D.end)+'！';
+  },
+  function(){
+    return R(D.open)+'。说实话一开始没抱太大期望，结果进门就被惊到了——'+R(D.env)+'。机器配置是'+R(D.cpu)+'配'+R(D.gpu)+'，这组合跑什么游戏都绰绰有余。屏幕是'+R(D.mon)+'，刷新率高到离谱，玩FPS那种跟手感真的回不去。'+R(D.svc)+'，'+R(D.price)+'。总而言之，'+R(D.end)+'。'
+  },
+  function(){
+    return '刷到这家店好几次了，今天终于来打卡。'+R(D.env)+'，整体氛围很舒服。配置的'+R(D.gpu)+'显卡，玩画质全开无压力，帧数稳得一批。'+R(D.net)+'。座椅是电竞椅，坐一天腰也不酸，这个细节必须好评。'+R(D.svc)+'。算下来'+R(D.price)+'。已经把这家加入常来清单了，'+R(D.end)+'。'
+  },
+  function(){
+    return '跟朋友开黑选了这家，果然没选错。'+R(D.env)+'。硬件是'+R(D.cpu)+'加'+R(D.gpu)+'的组合，这个配置在同价位网吧里真的算顶配了。'+R(D.mon)+'效果太赞了，打游戏定位精准，感觉自己都变强了哈哈。'+R(D.net)+'，完全没有延迟焦虑。'+R(D.svc)+'。'+R(D.end)+'，绝对是电竞爱好者的天堂！'
+  },
+  function(){
+    return '来这家已经不是第一次了，每次来体验都在线。'+R(D.env)+'。'+R(D.cpu)+R(D.gpu)+'这个配置，到目前为止没遇到过卡顿的情况，稳定输出。'+R(D.mon)+'用起来真的爽，高刷屏打FPS就是不一样。'+R(D.svc)+'。最关键的是'+R(D.price)+'。真心推荐给所有对配置有要求的玩家，'+R(D.end)+'。'
+  },
+  function(){
+    return '朋友安利我来这家网咖，来之前还半信半疑，来之后真香了。'+R(D.env)+'。机器是'+R(D.gpu)+'显卡，跑3A大作画质全开也毫无压力。'+R(D.net)+'。座椅舒适度满分，调节功能很全，坐久了也不累。'+R(D.svc)+'。'+R(D.price)+'。已经安利给群里所有队友了，'+R(D.end)+'！'
+  },
+  function(){
+    return '今天体验感拉满！这家网咖'+R(D.env)+'。配置方面'+R(D.cpu)+'配'+R(D.gpu)+'，这规格真的没话说。'+R(D.mon)+'显示效果细腻，玩久了眼睛也不容易累。'+R(D.mou)+'手感很好，微动清脆。'+R(D.net)+'。'+R(D.svc)+'。算算账'+R(D.price)+'。五星好评，'+R(D.end)+'。'
+  },
+  function(){
+    return '必须来发个好评！这家是我最近发现的一家宝藏网咖，'+R(D.env)+'。硬件配置'+R(D.cpu)+R(D.gpu)+'，这个组合打什么游戏都流畅。'+R(D.mon)+'的高刷新率用起来真的爽，感觉操作都变丝滑了。'+R(D.svc)+'。而且'+R(D.price)+'。已经推荐给身边所有玩游戏的朋友们了，'+R(D.end)+'！'
+  },
+  function(){
+    return '周末没事干，搜了一下附近评价高的网咖，选了这家。进门第一感觉：'+R(D.env)+'。上机之后发现配置真的顶，'+R(D.cpu)+'加'+R(D.gpu)+'，跑分贼高。'+R(D.mon)+'效果细腻，打游戏视觉享受。'+R(D.net)+'，完全没有网络焦虑。'+R(D.svc)+'。'+R(D.price)+'。总之这次体验很满意，'+R(D.end)+'。'
+  },
+  function(){
+    return '在这家待了一下午，整体体验超预期。'+R(D.env)+'。配置是'+R(D.gpu)+'显卡，这卡现在可是稀缺货，能在网吧用到真的惊喜。'+R(D.cpu)+'的处理器也很给力，多开不卡。'+R(D.mon)+'用起来眼睛不容易累，这个细节好评。'+R(D.svc)+'。'+R(D.end)+'，五星好评！'
+  },
+  function(){
+    return '真心觉得这家网咖被低估了，配置和环境都很能打。'+R(D.env)+'。'+R(D.cpu)+R(D.gpu)+'这个配置，目前在市面上绝对是第一梯队的。'+R(D.mon)+'配合高刷，打游戏那种流畅感真的无法形容。'+R(D.net)+'。'+R(D.svc)+'。最重要的是'+R(D.price)+'。已经收藏了，'+R(D.end)+'。'
+  },
+  function(){
+    return '今天跟队友五黑选了这家，体验满分！'+R(D.env)+'。机器配置'+R(D.gpu)+'，这个显卡现在可是香饽饽，能用到真的运气好。'+R(D.cpu)+'处理器也很猛，编译/渲染都不在话下。'+R(D.mon)+'显示效果太赞了。'+R(D.svc)+'。算下来'+R(D.price)+'。强烈推荐，'+R(D.end)+'！'
+  },
+  function(){
+    return '偶然路过进来试了一下，结果发现了宝藏。'+R(D.env)+'。配置方面'+R(D.cpu)+'配'+R(D.gpu)+'，这组合在网吧里真的算豪华了。'+R(D.mon)+'效果细腻，打游戏视觉体验满分。'+R(D.net)+'。座椅舒适度也很高，电竞椅支撑性很好。'+R(D.svc)+'。'+R(D.price)+'。必须好评，'+R(D.end)+'！'
+  },
+  function(){
+    return '这家网咖我必须单独夸一下。'+R(D.env)+'。硬件是'+R(D.gpu)+'显卡，这配置打3A大作画质全开毫无压力。'+R(D.cpu)+'处理器也很给力。'+R(D.mon)+'高刷屏用起来真的回不去，一旦用过就离不开了。'+R(D.net)+'。'+R(D.svc)+'。'+R(D.end)+'，五星走起！'
+  },
+  function(){
+    return '来这家上网已经成习惯了，每次来都很满意。今天特意来发个好评。'+R(D.env)+'。配置'+R(D.cpu)+R(D.gpu)+'，稳定运行，从来没有出现过掉帧卡顿的情况。'+R(D.mon)+'显示效果很好，长时间使用眼睛也不容易疲劳。'+R(D.svc)+'。'+R(D.price)+'。真心推荐，'+R(D.end)+'！'
   }
+];
 
-  // 鐜 + 鏈嶅姟锛堣嚦灏戝悇涓€鍙ワ級
-  parts.push(pick(DB.environment));
-  if (Math.random() > 0.4) parts.push(pick(DB.service));
+// ===== 随意版模板（自然口语化）=====
+var CASUAL = [
+  function(){ return R(D.open)+'，配置'+R(D.gpu)+'，打游戏丝滑到飞起，'+R(D.env)+'，老板人也好，下次还来！' },
+  function(){ return '这家配置真的顶！'+R(D.cpu)+'配'+R(D.gpu)+'，跑什么游戏都流畅，'+R(D.net)+'，强烈推荐！' },
+  function(){ return R(D.env)+'，机器是'+R(D.gpu)+'，打了一下午不卡顿，'+R(D.svc)+'，五星好评！' },
+  function(){ return '刷到这家店，今天来打卡。'+R(D.mon)+'效果太赞，'+R(D.net)+'，价位也合理，已经推荐给队友了！' },
+  function(){ return '跟朋友开黑选了这家，'+R(D.env)+'。'+R(D.gpu)+'显卡真的香，画质全开无压力，下次周末还来！' },
+  function(){ return R(D.env)+'，配置'+R(D.cpu)+R(D.gpu)+'，这个组合没得说，'+R(D.svc)+'，必须好评！' },
+  function(){ return '来这家上网是一种享受，'+R(D.mon)+'，操作跟手到爆，'+R(D.net)+'，性价比也很高，推荐！' },
+  function(){ return '无意中发现的宝藏网咖，'+R(D.env)+'。'+R(D.gpu)+'跑满帧，'+R(D.svc)+'，已经收藏了，'+R(D.end)+'！' },
+  function(){ return R(D.open)+'，'+R(D.price)+'，'+R(D.env)+'，配置也顶，打游戏从不掉链子，五星！' },
+  function(){ return '这家网咖真绝，'+R(D.cpu)+R(D.gpu)+'顶配，'+R(D.mon)+'用起来爽到爆，'+R(D.end)+'！' }
+];
 
-  // 娓告垙浣撻獙锛?0%姒傜巼锛?  if (Math.random() > 0.5) parts.push(pick(DB.gaming));
+// ===== 简短版模板 =====
+var SHORT = [
+  function(){ return R(D.short) },
+  function(){ return '配置：'+R(D.cpu)+'+'+R(D.gpu)+' | 屏幕：'+R(D.mon)+' | 网速：飞快 | 环境：'+R(D.env)+' | 五星好评！' },
+  function(){ return '高端配置，'+R(D.gpu)+'跑满帧，环境好服务棒，'+R(D.price)+'，强烈推荐！' },
+  function(){ return R(D.env)+'，硬件'+R(D.gpu)+'顶配，网速快到飞起，五星没毛病！' },
+  function(){ return '来这家上网太爽了，'+R(D.cpu)+R(D.gpu)+'，打游戏丝滑流畅，已经推荐给所有人了！' },
+  function(){ return '配置顶拉满，环境好，服务到位，'+R(D.price)+'，必须五星好评！' },
+  function(){ return R(D.mon)+'+'+R(D.gpu)+'，这配置打游戏就是享受，环境服务都在线，推荐！' },
+  function(){ return '网咖天花板级别，'+R(D.cpu)+R(D.gpu)+'，环境一流，五星好评走起！' }
+];
 
-  // 缁撳熬
-  parts.push(pick(DB.closers));
+// ===== 交互逻辑 =====
+var style = 'rich';
 
-  return parts.join('\n\n');
-}
+document.getElementById('styleTabs').onclick = function(e){
+  var t = e.target;
+  if(!t.dataset.s) return;
+  style = t.dataset.s;
+  var all = this.querySelectorAll('.tab');
+  for(var i=0;i<all.length;i++) all[i].classList.remove('on');
+  t.classList.add('on');
+  gen();
+};
 
-function generateCasual() {
-  const opener = pick(DB.casualOpeners);
-
-  // 闅忔満缁勫悎 3-4 涓淮搴︼紝姣忔绠€鐭?  const dims = pickN(
-    [
-      () => `閰嶇疆鏂归潰锛?{pick(DB.gpu).slice(0, 60)}...`,
-      () => `CPU 缁欏姏锛?{pick(DB.cpu).slice(0, 60)}...`,
-      () => `灞忓箷鐖界炕锛?{pick(DB.monitor).slice(0, 60)}...`,
-      () => `澶栬鑸掓湇锛?{pick(DB.peripheral).slice(0, 60)}...`,
-      () => `鐜涓嶉敊锛?{pick(DB.environment).slice(0, 60)}...`,
-      () => `鏈嶅姟鍒颁綅锛?{pick(DB.service).slice(0, 60)}...`,
-      () => `娓告垙浣撻獙锛?{pick(DB.gaming).slice(0, 60)}...`,
-    ],
-    3 + Math.floor(Math.random() * 2)
-  );
-
-  const closer = pick(DB.closers);
-
-  return opener + '\n' + dims.map(d => d()).join('\n') + '\n\n' + closer;
-}
-
-function generateShort() {
-  return pick(DB.shortTemplates);
-}
-
-function generateReview() {
-  let text;
-  let attempts = 0;
-
+function gen(){
+  var pool = (style==='rich') ? RICH : (style==='casual') ? CASUAL : SHORT;
+  var txt, i = 0;
   do {
-    switch (currentStyle) {
-      case 'rich': text = generateRich(); break;
-      case 'casual': text = generateCasual(); break;
-      case 'short': text = generateShort(); break;
-    }
-    attempts++;
-  } while (history.has(text) && attempts < 20);
-
-  history.add(text);
-  if (history.size > 200) { // 闃叉鍐呭瓨鑶ㄨ儉
-    const arr = Array.from(history);
-    history.clear();
-    arr.slice(-100).forEach(h => history.add(h));
-  }
-
-  genTotal++;
-
-  // Render with animation
-  const el = document.getElementById('reviewText');
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(10px)';
-
-  setTimeout(() => {
-    el.textContent = text;
-    el.style.transition = 'opacity .3s, transform .3s';
-    el.style.opacity = '1';
-    el.style.transform = 'translateY(0)';
-  }, 150);
-
-  document.getElementById('genCount').innerHTML = `宸茬敓鎴?<span>${genTotal}</span> 鏉′笉閲嶅璇勪环`;
-
-  // Scan effect
-  const card = document.getElementById('reviewCard');
-  card.classList.remove('scanning');
-  void card.offsetWidth;
-  card.classList.add('scanning');
-
-  // Reset copy button
-  const btn = document.getElementById('copyBtn');
-  btn.classList.remove('copied');
-  document.querySelector('#copyBtn span').textContent = '涓€閿鍒?;
+    txt = pool[Math.random()*pool.length|0]();
+    i++;
+  } while(hist.indexOf(txt)>=0 && i<50);
+  hist.push(txt);
+  if(hist.length > MAX) hist.shift();
+  document.getElementById('out').value = txt;
+  cnt++;
+  document.getElementById('cnt').textContent = '已生成 '+cnt+' 条';
 }
 
-// ============================================================
-// 澶嶅埗鍔熻兘
-// ============================================================
-
-function copyReview() {
-  const text = document.getElementById('reviewText').textContent;
-  const btn = document.getElementById('copyBtn');
-  const btnText = document.querySelector('#copyBtn span');
-
-  // Scan animation
-  const card = document.getElementById('reviewCard');
-  card.classList.remove('scanning');
-  void card.offsetWidth;
-  card.classList.add('scanning');
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => showCopied()).catch(() => fallbackCopy(text));
+function doCopy(){
+  var v = document.getElementById('out').value;
+  if(!v){ alert('请先生成一条好评'); return }
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(v).then(ok);
   } else {
-    fallbackCopy(text);
+    var ta = document.getElementById('out');
+    ta.select();
+    document.execCommand('copy');
+    ok();
+  }
+  function ok(){
+    var b = document.getElementById('cpBtn');
+    b.textContent = '✅ 已复制';
+    b.classList.add('done');
+    setTimeout(function(){
+      b.textContent = '📋 一键复制';
+      b.classList.remove('done');
+    }, 2000);
   }
 }
 
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand('copy'); showCopied(); } catch(e) { showToast('澶嶅埗澶辫触锛岃闀挎寜鏂囧瓧鎵嬪姩澶嶅埗'); }
-  document.body.removeChild(ta);
-}
-
-function showCopied() {
-  const btn = document.getElementById('copyBtn');
-  const btnText = document.querySelector('#copyBtn span');
-  btn.classList.add('copied');
-  btnText.textContent = '鉁?宸插鍒讹紒鍘荤矘璐村惂';
-
-  showToast('澶嶅埗鎴愬姛锛佸幓绮樿创鍚?鉁?);
-  setTimeout(() => { btn.classList.remove('copied'); btnText.textContent = '涓€閿鍒?; }, 2500);
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ============================================================
-// Tab & Platform switching
-// ============================================================
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentStyle = tab.dataset.style;
-    generateReview();
-  });
-});
-
-document.querySelectorAll('.platform-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-// ============================================================
-// Init
-// ============================================================
-generateReview();
+gen();
 </script>
 </body>
 </html>
