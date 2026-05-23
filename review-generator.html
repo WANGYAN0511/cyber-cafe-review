@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>濂借瘎鐢熸垚鍣?路 鏋佽嚧鐢电珵</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    :root {
+      --bg: #050510;
+      --card: #0d0d24;
+      --card-hover: #12122e;
+      --accent: #00f5ff;
+      --accent2: #7b2fff;
+      --accent3: #ff2d78;
+      --text: #e8e8ff;
+      --text-dim: #8888bb;
+      --border: rgba(0, 245, 255, 0.15);
+      --success: #00e676;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .orb-1 { width:400px;height:400px;background:rgba(123,47,255,.18);top:-100px;right:-100px; }
+    .orb-2 { width:350px;height:350px;background:rgba(0,245,255,.12);bottom:-80px;left:-80px; }
+    .orb-3 { width:250px;height:250px;background:rgba(255,45,120,.10);top:50%;left:50%;transform:translate(-50%,-50%); }
+
+    .container { position:relative; z-index:1; max-width:600px; margin:0 auto; padding:24px 16px 60px; }
+
+    /* Header */
+    .header { text-align:center; padding:28px 0 20px; }
+    .logo-bar {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(0,245,255,.06); border:1px solid var(--border);
+      border-radius:50px; padding:6px 16px; margin-bottom:16px;
+    }
+    .logo-dot { width:8px;height:8px;border-radius:50%;background:var(--accent);
+      animation:pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot {
+      0%,100%{opacity:1;box-shadow:0 0 6px var(--accent);}
+      50%{opacity:.4;box-shadow:none;}
+    }
+    .logo-text { font-size:12px;font-weight:700;letter-spacing:3px;color:var(--accent);text-transform:uppercase; }
+    .header h1 { font-size:24px;font-weight:900;line-height:1.2;
+      background:linear-gradient(135deg,#fff 30%,var(--accent));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px; }
+    .header p { color:var(--text-dim);font-size:13px; }
+
+    /* Stats */
+    .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px; }
+    .stat-item { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center; }
+    .stat-value { font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--accent),#b57fff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2; }
+    .stat-label { font-size:9px;color:var(--text-dim);margin-top:2px;font-weight:500; }
+
+    /* Platform */
+    .platform-row { display:flex; gap:8px; margin-bottom:14px; }
+    .platform-btn { flex:1;padding:9px;background:var(--card);border:1px solid var(--border);
+      border-radius:10px;color:var(--text-dim);font-family:inherit;font-size:11px;font-weight:700;
+      cursor:pointer;transition:all .2s;text-align:center;user-select:none; }
+    .platform-btn.active { background:rgba(255,45,120,.1);border-color:var(--accent3);color:var(--accent3); }
+
+    /* Style tabs */
+    .tabs { display:flex; gap:8px; margin-bottom:14px; }
+    .tab { flex:1;padding:10px 6px;background:var(--card);border:1px solid var(--border);
+      border-radius:10px;color:var(--text-dim);font-size:12px;font-weight:700;cursor:pointer;
+      transition:all .2s;text-align:center;user-select:none; }
+    .tab.active { background:rgba(0,245,255,.1);border-color:var(--accent);color:var(--accent); }
+
+    /* Review card */
+    .review-card {
+      background:var(--card);border:1px solid var(--border);border-radius:18px;
+      padding:22px 18px;margin-bottom:14px;position:relative;overflow:hidden;
+    }
+    .review-card::before {
+      content:''; position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3));
+    }
+    .scan-line { position:absolute;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,transparent,var(--accent),transparent);pointer-events:none;z-index:10; }
+    @keyframes scan { 0%{top:-5%;opacity:.8;} 100%{top:105%;opacity:0;} }
+    .review-card.scanning .scan-line { animation:scan .55s ease-out forwards; }
+
+    .specs-grid { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px; }
+    .spec-chip { background:rgba(123,47,255,.12);border:1px solid rgba(123,47,255,.3);
+      border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:#b57fff;white-space:nowrap; }
+
+    .review-text { font-size:14.5px;line-height:1.85;color:#d8d8f0;white-space:pre-wrap;min-height:180px;word-break:break-word; }
+
+    .gen-count { text-align:center;margin-top:12px;font-size:11px;color:var(--text-dim); }
+    .gen-count span { color:var(--accent);font-weight:700; }
+
+    /* Buttons */
+    .btn-row { display:flex;gap:10px;margin-bottom:14px; }
+    .action-btn {
+      flex:1;padding:15px;border:none;border-radius:14px;color:#fff;
+      font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;display:flex;
+      align-items:center;justify-content:center;gap:7px;transition:all .25s;letter-spacing:1px;
+      position:relative;overflow:hidden;
+    }
+    .action-btn::after {
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15) 60%, transparent 80%);
+      transform:translateX(-100%);transition:transform .5s;
+    }
+    .action-btn:hover::after { transform:translateX(100%); }
+    .action-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,245,255,.25); }
+    .action-btn:active { transform:translateY(0); }
+
+    .refresh-btn { background:linear-gradient(135deg,#333,#444);border:1px solid rgba(255,255,255,.1);color:#ccc; }
+    .refresh-btn:hover { box-shadow:0 8px 30px rgba(255,255,255,.1); }
+    .copy-btn { background:linear-gradient(135deg,var(--accent2),var(--accent)); }
+    .copy-btn:hover { box-shadow:0 8px 30px rgba(0,245,255,.35); }
+    .copy-btn.copied { background:linear-gradient(135deg,#00c853,#00e676); }
+
+    /* Toast */
+    .toast {
+      position:fixed;bottom:32px;left:50%;
+      transform:translateX(-50%) translateY(80px);
+      background:#1a1a3a;border:1px solid var(--accent);border-radius:12px;
+      padding:12px 24px;font-size:14px;font-weight:700;color:var(--accent);
+      z-index:1000;transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+      white-space:nowrap;box-shadow:0 4px 30px rgba(0,245,255,.2);
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    .footer { text-align:center;padding:16px 0;color:var(--text-dim);font-size:10px; }
+
+    /* Refresh spin */
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .spinning svg { animation:spin .5s linear; }
+  </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo-bar"><div class="logo-dot"></div><span class="logo-text">濂借瘎鐢熸垚鍣?/span></div>
+    <h1>涓€閿敓鎴?路 姣忔涓嶅悓</h1>
+    <p>姣忔鍒锋柊閮芥槸鍏ㄦ柊璇勪环锛屽憡鍒崈绡囦竴寰?/p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-value">5090D</div><div class="stat-label">椤剁骇鏄惧崱</div></div>
+    <div class="stat-item"><div class="stat-value">9950X3D</div><div class="stat-label">鏃楄埌CPU</div></div>
+    <div class="stat-item"><div class="stat-value">720Hz</div><div class="stat-label">鐢电珵灞?/div></div>
+    <div class="stat-item"><div class="stat-value">GPW3</div><div class="stat-label">鏃楄埌榧犳爣</div></div>
+  </div>
+
+  <div class="platform-row">
+    <button class="platform-btn active" data-platform="dianping">澶т紬鐐硅瘎</button>
+    <button class="platform-btn" data-platform="meituan">缇庡洟</button>
+    <button class="platform-btn" data-platform="other">鍏朵粬骞冲彴</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-style="rich">涓板瘜鐗?/button>
+    <button class="tab" data-style="casual">闅忔剰鐗?/button>
+    <button class="tab" data-style="short">绠€鐭増</button>
+  </div>
+
+  <div class="review-card" id="reviewCard"><div class="scan-line"></div>
+    <div class="specs-grid" id="specsGrid">
+      <span class="spec-chip">RTX 5090D</span>
+      <span class="spec-chip">9950X3D</span>
+      <span class="spec-chip">720Hz 灞?/span>
+      <span class="spec-chip">缃楁妧 GPW3</span>
+    </div>
+    <div class="review-text" id="reviewText"></div>
+    <div class="gen-count" id="genCount">宸茬敓鎴?<span>0</span> 鏉′笉閲嶅璇勪环</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="action-btn refresh-btn" id="refreshBtn" onclick="generateReview()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      鍒锋柊璇勪环
+    </button>
+    <button class="action-btn copy-btn" id="copyBtn" onclick="copyReview()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      涓€閿鍒?    </button>
+  </div>
+
+  <div class="footer">鏋佽嚧鐢电珵棣?路 濂借瘎鐢熸垚宸ュ叿</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// 绱犳潗搴?鈥?姣忎釜缁村害鐨勭嫭绔嬪彞瀛?娈佃惤锛岄殢鏈虹粍鍚?// ============================================================
+
+const DB = {
+
+  // 寮€澶撮挬瀛愶紙鍚稿紩鐪肩悆锛?  openers: [
+    "杩欏缃戝惂鐪熺殑鍒锋柊浜嗘垜瀵广€岀數绔為銆嶄笁涓瓧鐨勮鐭?,
+    "浣滀负涓€涓€佺綉鐦惧皯骞达紝鍘昏繃鍑犲崄瀹剁綉鍚т簡锛岃繖瀹跺繀椤绘帓鍓嶄笁",
+    "琚湅鍙嬪畨鍒╂潵鐨勶紝鏉ヤ簡涔嬪悗鍙戠幇鐪熺殑娌¤俯闆?,
+    "绗竴娆℃潵杩欏搴楋紝浣撻獙鎰熺洿鎺ユ媺婊?,
+    "鏈潵鍙兂鎵撲袱鎶婂氨璧帮紝缁撴灉涓€鍧愬氨鏄竴涓嬪崍",
+    "杩欓厤缃€佽繖鐜銆佽繖鏈嶅姟锛岃瀹炶瘽姣斿緢澶氫竴绾垮煄甯傜殑鐢电珵棣嗛兘寮?,
+    "鍛ㄦ湯璺熸湅鍙嬬害鐫€鏉ュ紑榛戯紝閫夎繖瀹剁湡鐨勯€夊浜?,
+    "涔嬪墠鍦ㄥ埆瀹舵墦杩囷紝瀵规瘮涓嬫潵宸窛澶槑鏄句簡",
+    "璺繃杩涙潵璇曡瘯锛岀粨鏋滆绉嶈崏浜?,
+    "鍐茬潃楂橀厤鏈哄櫒鏉ョ殑锛屽疄闄呬綋楠岃秴鍑洪鏈?,
+    "鏈嬪弸璇磋繖瀹剁綉鍚ч厤缃ぉ鑺辨澘锛屼粖澶╂潵楠岃瘉浜嗕竴涓嬶紝纭疄鐗?,
+    "鍦ㄩ檮杩戝姙浜嬮『渚挎潵鎵撲袱鎶婏紝娌℃兂鍒板彂鐜颁簡瀹濊棌搴楅摵",
+    "鐪嬩簡涓嬪ぇ浼楃偣璇勮瘎鍒嗗緢楂橈紝鎶辩潃璇曡瘯鐨勫績鎬佹潵锛岀粨鏋滅湡棣?,
+    "宸茬粡鏉ヨ繃濂藉嚑娆′簡锛屾瘡娆′綋楠岄兘寰堢ǔ瀹?,
+    "鏂板紑鐨勭數绔為锛岃澶囧叏鏂帮紝浣撻獙鎰熸媺婊?,
+  ],
+
+  // 鏄惧崱鎻忚堪
+  gpu: [
+    "鏄惧崱鏄?RTX 5070 璧锋锛岄《閰嶇洿鎺ヤ笂鍒?5090D锛岃窇銆婇粦绁炶瘽銆嬨€婅禌鍗氭湅鍏?077銆嬭繖绉嶅ぇ浣滅壒鏁堝叏寮€甯ф暟绋冲娉板北锛岀敾闈㈡祦鐣呭緱鍍忓湪鐪嬬數褰?,
+    "RTX 5090D 鐨勬満鍣ㄦ垜璇曚簡锛屽厜杩藉叏寮€璺?3A 澶т綔瀹屽叏娌″帇鍔涳紝甯ф暟闅忎究鐮寸櫨锛岄偅绉嶄笣婊戞劅鍙湁浜茶嚜涓婃墜鎵嶈兘浣撲細",
+    "鏄惧崱閰嶇疆鐪熺殑寰堥《锛?070 鍒?5090D 澶氭。鍙€夛紝涓嶇浣犳槸鎵?FPS 杩樻槸鐜?3A 澶т綔閮借兘鎵惧埌鍚堥€傜殑閰嶇疆",
+    "5090D + DLSS 寮€鍚悗锛?K 鍒嗚鲸鐜囦笅甯ф暟渚濈劧璧烽锛岃繖绉嶆€ц兘閲婃斁鍔涘湪鍚屼环浣嶇綉鍚ч噷鍩烘湰鎵句笉鍒板鎵?,
+    "瀹炴祴浜嗕竴涓?5090D 鏈哄櫒锛屻€婅壘灏旂櫥娉曠幆銆嬫渶楂樼敾璐ㄧǔ瀹?120 甯?锛屾樉鍗℃俯搴︽帶鍒朵篃寰堜紭绉€锛屾暎鐑仛寰椾笉閿?,
+    "鏄惧崱浠?5070 璧锋杩欎釜瀹氫綅灏卞緢鑹績浜嗭紝寰堝缃戝惂杩樺湪鐢?40 绯诲垪锛岃繖閲岀洿鎺ヤ笂 50 绯诲垪鏂板崱",
+  ],
+
+  // CPU 鎻忚堪
+  cpu: [
+    "CPU 闃靛鏄?7800X3D / 9800X3D / 9950X3D 涓夋。鍙€夛紝X3D 绯诲垪鐨勫ぇ缂撳瓨瀵规父鎴忓抚鏁版彁鍗囬潪甯告槑鏄撅紝灏ゅ叾鏄綉娓稿満鏅?,
+    "9950X3D 杩欓 U 鎵撴父鎴忕畝鐩存槸闄嶇淮鎵撳嚮锛岄厤鍚?5090D 鍩烘湰涓婄洰鍓嶅競闈笂娌℃湁浠讳綍娓告垙鑳介毦鍊掑畠",
+    "AMD X3D 绯诲垪澶勭悊鍣ㄦ墦娓告垙鏄湡鐨勯锛屽ぇ缂撳瓨璁捐璁╂父鎴忔渶浣庡抚鍜?1% Low 甯ч兘鐗瑰埆绋筹紝涓嶄細鍑虹幇绐佺劧鎺夊抚鐨勬儏鍐?,
+    "CPU 缁欏埌浜?9950X3D 杩欎釜绾у埆锛岃瀹炶瘽寰堝瀹剁敤鐢佃剳閮芥病杩欓厤缃紝鍦ㄨ繖閲屾墦娓告垙鐪熺殑鏄韩鍙?,
+    "7800X3D 鎬т环姣旇秴楂橈紝9800X3D 鍧囪　涔嬮€夛紝9950X3D 鐩存帴鎷夋弧锛屼笁妗ｉ厤缃鐩栦簡涓嶅悓棰勭畻鐨勯渶姹?,
+  ],
+
+  // 鏄剧ず鍣ㄦ弿杩?  monitor: [
+    "鏄剧ず鍣ㄦ槸閲嶅ご鎴忊€斺€斿崜濞?600Hz銆丷OG 2K 540Hz銆丷OG 1K 720Hz 涓夌瑙勬牸锛孎PS 鐜╁鐙傚枩锛?20Hz 鐨勫埛鏂扮巼鎵?CS2/鐡︾綏鍏扮壒绠€鐩村紑浜嗙墿鐞嗗鎸?,
+    "720Hz 鐨勬樉绀哄櫒绗竴娆＄敤锛岄偅绉嶆祦鐣呮劅璺?144Hz 瀹屽叏鏄袱涓笘鐣岋紝鏁屼汉绉诲姩杞ㄨ抗鐪嬪緱娓呮竻妤氭锛岀瀯鍑嗙簿鍑嗗害鎻愬崌鏄庢樉",
+    "鍗撳▉鐨?600Hz 灞忚壊褰╄繕鍘熷害寰堝ソ锛孯OG 鐨?540Hz 2K 灞忓吋椤剧敾璐ㄥ拰娴佺晠搴︼紝鏍规嵁鑷繁鎵撶殑 game 閫夊氨琛?,
+    "鏄剧ず鍣ㄨ繖鍧楃湡鐨勪笅浜嗚鏈紝720Hz 楂樺埛灞忓湪鍚屽煄缃戝惂閲屽簲璇ユ槸鐙竴浠界殑瀛樺湪锛岃亴涓氶€夋墜璁粌绾у埆鐨勯厤缃?,
+    "灞忓箷绱犺川寰堟锛屼笉绠℃槸 FPS 杩樻槸 MOBA 鎴栬€?3A 澶т綔閮芥湁瀵瑰簲鐨勬渶浣虫樉绀烘柟妗堬紝杩欑偣寰堢敤蹇?,
+  ],
+
+  // 澶栬鎻忚堪
+  peripheral: [
+    "鍏ㄥ満鏍囬厤缃楁妧 GPW3 浠ｆ棗鑸伴紶鏍囷紝杩欐榧犳爣閲嶉噺杞汇€佷紶鎰熷櫒绮惧噯锛岄暱鏃堕棿鎵撴父鎴忔墜鑵曚篃涓嶇疮锛屾墜鎰熺‘瀹為《绾?,
+    "GPW3 鏄洰鍓嶈亴涓氳禌鍦哄嚭鍦虹巼鏈€楂樼殑榧犳爣涔嬩竴锛岃繖閲屽叏鍦烘爣閰嶈鏄庤€佹澘鏄湡鎳傜帺瀹堕渶姹?,
+    "榧犳爣鏄?GPW3锛岄敭鐩樹篃鏄満姊拌酱浣擄紝鎸夐敭鍙嶉娓呰剢锛屾暣浣撳璁炬按骞宠繙瓒呮櫘閫氱綉鍚?,
+    "澶栬杩欏潡娌℃湁缂╂按锛孏PW3 榧犳爣 + 鏈烘閿洏 + 浜轰綋宸ュ妞咃紝涓€濂椾笅鏉ユ瘮鑷繁鍦ㄥ閰嶈繕鍒掔畻",
+    "鐢ㄤ簡 GPW3 涔嬪悗鎰熻浠ュ墠鐢ㄧ殑榧犳爣閮芥槸鍨冨溇锛岃交閲忓寲璁捐 + Hero 2 浼犳劅鍣紝鎸囧摢鎵撳摢涓嶆槸鍚圭殑",
+  ],
+
+  // 鐜/姘涘洿
+  environment: [
+    "鐜鏂归潰鐏厜璁捐寰堟湁璧涘崥鏈嬪厠鐨勬劅瑙夛紝RGB 姘涘洿鐏甫浣嗕笉鍒虹溂锛屾墦璧锋父鎴忔潵娌夋蹈鎰熷緢寮?,
+    "搴т綅闂磋窛澶熷锛屼笉浼氬儚鏈変簺缃戝惂鎸ゅ緱闅惧彈锛屾矙鍙戞鍧愮潃鑸掓湇锛岃繛鍧愬嚑涓皬鏃惰叞閮戒笉閰?,
+    "绌鸿皟缁欏姏锛屽澶╄繘鏉ュ噳蹇緱寰堬紝鍐ぉ鏆栨皵涔熻冻锛屾俯搴︽帶鍒跺垰鍒氬ソ",
+    "鍗敓鎵撴壂寰楀緢骞插噣锛屾闈㈡病鏈夋补娓嶇儫鐏帮紝鍘曟墍涔熸病鏈夊紓鍛筹紝杩欑偣瀵圭綉鍚ф潵璇村お闅惧緱浜?,
+    "鏁翠綋瑁呬慨椋庢牸鍋忕鎶€鎰燂紝娣辫壊璋冧负涓婚厤涓婇湏铏圭伅鏁堬紝鎷嶇収鍙戞湅鍙嬪湀閮藉ソ鐪?,
+    "闅旈煶鏁堟灉涓嶉敊锛屼笉浼氳闅斿鍚靛埌锛屾瘡涓汉鏈夎嚜宸辩殑灏忕┖闂达紝绉佸瘑鎬у緢濂?,
+    "缃戦€熼蹇紝涓嬭浇娓告垙鍑犲垎閽熷氨鎼炲畾锛屽湪绾跨湅瑙嗛銆佺洿鎾畬鍏ㄤ笉鍗￠】",
+    "楗枡闆堕绉嶇被澶氾紝浠锋牸涔熷悎鐞嗭紝涓嶇敤鑷繁甯︿笢瑗胯繃鏉ワ紝楗夸簡闅忔椂鑳界偣",
+  ],
+
+  // 鏈嶅姟鎻忚堪
+  service: [
+    "搴楀憳鏈嶅姟鎬佸害鐗瑰埆濂斤紝鏈夋眰蹇呭簲锛屾崲榧犳爣鍨€佽皟鏄剧ず鍣ㄣ€佸府蹇欓噸鍚粈涔堢殑鍝嶅簲寰堝揩",
+    "鍓嶅彴灏忓濮?灏忓摜鍝ュ緢鐑儏锛岃繘闂ㄥ氨寮曞閫夊骇锛岃繕浼氫富鍔ㄩ棶闇€瑕佷粈涔堝府鍔?,
+    "閬囧埌鎶€鏈棶棰樺枈涓€澹板氨鏈変汉鏉ュ鐞嗭紝涓嶅儚鏈夌殑缃戝惂鍠婂崐澶╂病浜虹悊",
+    "鍏呭€间細鍛樿繕鏈変紭鎯犳椿鍔紝鎬т环姣旀尯楂樼殑锛岀粡甯告潵鎵撶殑璇濆姙寮犲崱寰堝垝绠?,
+    "搴楅噷杩樻彁渚涘厖鐢电嚎銆佽€虫満绛夊€熺敤鏈嶅姟锛屽繕甯︿笢瑗夸篃涓嶇敤鎱?,
+    "澶滃鏃舵杩樻湁鐗逛环濂楅锛屾墦鍒板崐澶滈タ浜嗙洿鎺ョ偣涓€浠斤紝寰堟柟渚?,
+  ],
+
+  // 娓告垙浣撻獙
+  gaming: [
+    "鎵撲簡鍑犱釜灏忔椂銆婃棤鐣忓绾︺€嬶紝鏋硶鎰熻閮芥瘮骞虫椂鍑嗕簡涓嶅皯锛岄珮鍒峰睆 + 浣庡欢杩熺殑缁勫悎纭疄鎻愬崌宸ㄥぇ",
+    "璺熸湅鍙嬩簲榛戝紑浜嗕竴鎶婂張涓€鎶婏紝璇煶娓呮櫚涓嶅崱椤匡紝鍥㈤槦閰嶅悎璧锋潵鐗瑰埆鐖?,
+    "鍗曟満鍏氱闊筹紝Steam 搴撻噷鐨勬父鎴忕粓浜庡彲浠ユ弧鐗规晥杩愯浜嗭紝涔嬪墠鍦ㄥ鐢佃剳鏍规湰甯︿笉鍔?,
+    "LOL 鍥㈡垬鎶€鑳戒贡椋炵殑鏃跺€欏抚鏁颁緷鐒剁ǔ瀹氾紝鍐嶄篃涓嶆€曞叧閿椂鍒绘帀甯у潙闃熷弸浜?,
+    "鍚冮浮鍐宠禌鍦?1v1 瀵规灙鐨勬椂鍊欙紝720Hz 灞忕殑浼樺娍浣撶幇寰楁穻婕撳敖鑷达紝鍙嶅簲閫熷害鎷夋弧",
+    "涓嬩簡鍑犱釜鎯崇帺寰堜箙浣嗗閲岀數鑴戣窇涓嶅姩鐨勫ぇ浣滐紝缁堜簬鍙互濂藉ソ浣撻獙鍓ф儏浜?,
+  ],
+
+  // 缁撳熬鎬荤粨
+  closers: [
+    "鎬讳箣锛岃繖瀹跺簵鏃犺鏄‖浠堕厤缃繕鏄蒋浠舵湇鍔￠兘鍦ㄧ嚎锛屼簲鏄熸帹鑽愶紝涓嬫杩樻潵锛?,
+    "缁煎悎浣撻獙婊″垎锛屽凡缁忓姞鍏ユ垜鐨勫父椹诲垪琛ㄤ簡锛屼互鍚庢墦娓告垙灏辫鍑嗚繖瀹?,
+    "鐪熷績鎺ㄨ崘缁欐墍鏈夌埍鎵撴父鎴忕殑鏈嬪弸锛屾潵涓€娆′綘灏辩煡閬撳樊璺濅簡",
+    "鎬т环姣斻€侀厤缃€佺幆澧冦€佹湇鍔″叏鏂逛綅鍦ㄧ嚎锛岃繖瀹跺簵鍊煎緱涓€涓簲鏄熷ソ璇?,
+    "濡傛灉浣犱篃鍦ㄦ壘涓€瀹堕潬璋辩殑鐢电珵棣嗭紝杩欏缁濆鍊煎緱鏉ヨ瘯璇?,
+    "鎵撳畬杩欎竴娉㈠凡缁忓喅瀹氬姙浼氬憳浜嗭紝浠ュ悗杩欏氨鏄垜鐨勫揩涔愯€佸",
+    "涓嶅璇翠簡锛屾噦鐨勮嚜鐒舵噦锛屼笉鎳傜殑鏉ヤ綋楠屼竴娆″氨鏄庣櫧浜?,
+    "鎬荤粨涓€鍙ヨ瘽锛氶厤缃ぉ鑺辨澘 + 鏈嶅姟鍒颁綅 + 鐜鑸掗€?= 鐢电珵鐜╁鐨勭悊鎯虫嵁鐐?,
+    "宸茬粡鎺ㄨ崘缁欐父鎴忕兢鐨勬湅鍙嬩簡锛屼笅娆＄粍鍥㈠啀鏉?,
+    "鍐欒繖涔堝灏辨槸涓轰簡鍛婅瘔澶у锛氳繖瀹跺簵锛屽€煎緱锛?,
+  ],
+
+  // 绠€鐭増妯℃澘锛堟暣鍙ワ級
+  shortTemplates: [
+    "RTX 5090D + 9950X3D + 720Hz 鐢电珵灞?+ GPW3 榧犳爣锛岄厤缃媺婊°€傜幆澧冨共鍑€鑸掗€傦紝绌鸿皟瓒筹紝鏈嶅姟鐑儏锛屼簲鏄熸帹鑽愶紒",
+    "璁惧椤剁骇锛?090D 璺?3A 澶т綔姣棤鍘嬪姏锛?20Hz 灞忔墦 FPS 澶埥浜嗐€傚崼鐢熷共鍑€锛屽簵鍛樺搷搴斿揩锛屾€т环姣旇秴楂樸€?,
+    "琚湅鍙嬪畨鍒╂潵鐨勶紝鏋滅劧娌¤俯闆枫€?090D + 9950X3D 鐨勬満鍣ㄤ笣婊戝埌椋炶捣锛孏PW3 鎵嬫劅缁濅簡锛岀幆澧冧篃濂姐€?,
+    "杩欏缃戝惂閰嶇疆鐪熺殑椤讹紝5070 璧?5090D 灏侀《锛屾樉绀哄櫒鏈€楂?720Hz锛屽叏鍦?GPW3銆傜幆澧冩湇鍔￠兘鍦ㄧ嚎锛屽己鐑堟帹鑽愩€?,
+    "浣撻獙鎰熸媺婊★紒5090D 鏈哄櫒璺戜簡鎶婇粦绁炶瘽锛岀壒鏁堝叏寮€甯ф暟鐮寸櫨銆傚骇妞呰垝鏈嶇┖璋冭冻锛屾墦浜嗕竴涓嬪崍涓嶆兂璧般€?,
+    "鍚屼环浣嶉噷閰嶇疆鏈€鐚涚殑涓€瀹讹紝9950X3D + 5090D + 720Hz 灞忥紝澶栬鍏ㄦ槸鏃楄埌娆俱€傜幆澧冨崼鐢熸湇鍔℃€佸害閮芥病姣涚梾銆?,
+    "鏉ヨ繃寰堝瀹剁綉鍚э紝杩欏缁煎悎浣撻獙鑳芥帓鍓嶄笁銆傜‖浠堕厤缃ぉ鑺辨澘绾у埆锛岀幆澧冭禌鍗氶锛屾湇鍔′篃鍒颁綅銆?,
+    "鍛ㄦ湯璺熸湅鍙嬫潵寮€榛戠殑锛屽ぇ瀹朵竴鑷磋涓鸿繖瀹舵槸鐩墠鎵撹繃鏈€濂界殑銆?090D + 720Hz锛孎PS 鐜╁鐨勫ぉ鍫傘€?,
+    "璁惧鍏ㄦ柊閰嶇疆楂橈紝5090D + X3D 绯诲垪 CPU + 楂樺埛灞忥紝鎵撴父鎴忎笣婊戞祦鐣呫€備綅缃ソ鎵惧仠杞︽柟渚匡紝浜旀槦濂借瘎銆?,
+    "鍐茬潃楂橀厤鏉ョ殑锛?090D 鏈哄櫒鏋滅劧鍚嶄笉铏氫紶銆侴PW3 榧犳爣 + 720Hz 灞忓箷缁勫悎锛屾墦 CS2 鐖藉埌椋炶捣銆?,
+  ],
+
+  // 闅忔剰鐗堝紑澶?  casualOpeners: [
+    "璇磋浠婂ぉ鐨勪綋楠屽惂鈥斺€?,
+    "绠€鍗曡瘎浠蜂竴涓嬶細",
+    "鏉ユ墦涓垎锛?,
+    "鎰熷彈鍒嗕韩锛?,
+    "鐪熷疄浣撻獙鎶ュ憡锛?,
+    "涓嶅惞涓嶉粦锛岃璇磋繖瀹跺簵锛?,
+    "绾矾浜虹湡瀹炴劅鍙楋細",
+    "鍒氭墦瀹屽嚑鎶婏紝鏉ヨ璇达細",
+    "浣撻獙瀹屾潵鐣欎釜瑷€锛?,
+    "缁欏悗鏉ヤ汉鍋氫釜鍙傝€冿細",
+  ],
+};
+
+// ============================================================
+// 宸ュ叿鍑芥暟
+// ============================================================
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function pickN(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+let genTotal = 0;
+const history = new Set();
+let currentStyle = 'rich';
+
+// ============================================================
+// 鐢熸垚鍣?// ============================================================
+
+function generateRich() {
+  const parts = [];
+
+  // 寮€澶?  parts.push(pick(DB.openers));
+
+  // 闅忔満閫?2-3 涓‖浠剁淮搴﹁缁嗗睍寮€
+  const hwPool = shuffle(['gpu', 'cpu', 'monitor', 'peripheral']);
+  const hwCount = 2 + Math.floor(Math.random() * 2); // 2 or 3
+  for (let i = 0; i < hwCount; i++) {
+    parts.push(pick(DB[hwPool[i]]));
+  }
+
+  // 鐜 + 鏈嶅姟锛堣嚦灏戝悇涓€鍙ワ級
+  parts.push(pick(DB.environment));
+  if (Math.random() > 0.4) parts.push(pick(DB.service));
+
+  // 娓告垙浣撻獙锛?0%姒傜巼锛?  if (Math.random() > 0.5) parts.push(pick(DB.gaming));
+
+  // 缁撳熬
+  parts.push(pick(DB.closers));
+
+  return parts.join('\n\n');
+}
+
+function generateCasual() {
+  const opener = pick(DB.casualOpeners);
+
+  // 闅忔満缁勫悎 3-4 涓淮搴︼紝姣忔绠€鐭?  const dims = pickN(
+    [
+      () => `閰嶇疆鏂归潰锛?{pick(DB.gpu).slice(0, 60)}...`,
+      () => `CPU 缁欏姏锛?{pick(DB.cpu).slice(0, 60)}...`,
+      () => `灞忓箷鐖界炕锛?{pick(DB.monitor).slice(0, 60)}...`,
+      () => `澶栬鑸掓湇锛?{pick(DB.peripheral).slice(0, 60)}...`,
+      () => `鐜涓嶉敊锛?{pick(DB.environment).slice(0, 60)}...`,
+      () => `鏈嶅姟鍒颁綅锛?{pick(DB.service).slice(0, 60)}...`,
+      () => `娓告垙浣撻獙锛?{pick(DB.gaming).slice(0, 60)}...`,
+    ],
+    3 + Math.floor(Math.random() * 2)
+  );
+
+  const closer = pick(DB.closers);
+
+  return opener + '\n' + dims.map(d => d()).join('\n') + '\n\n' + closer;
+}
+
+function generateShort() {
+  return pick(DB.shortTemplates);
+}
+
+function generateReview() {
+  let text;
+  let attempts = 0;
+
+  do {
+    switch (currentStyle) {
+      case 'rich': text = generateRich(); break;
+      case 'casual': text = generateCasual(); break;
+      case 'short': text = generateShort(); break;
+    }
+    attempts++;
+  } while (history.has(text) && attempts < 20);
+
+  history.add(text);
+  if (history.size > 200) { // 闃叉鍐呭瓨鑶ㄨ儉
+    const arr = Array.from(history);
+    history.clear();
+    arr.slice(-100).forEach(h => history.add(h));
+  }
+
+  genTotal++;
+
+  // Render with animation
+  const el = document.getElementById('reviewText');
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(10px)';
+
+  setTimeout(() => {
+    el.textContent = text;
+    el.style.transition = 'opacity .3s, transform .3s';
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  }, 150);
+
+  document.getElementById('genCount').innerHTML = `宸茬敓鎴?<span>${genTotal}</span> 鏉′笉閲嶅璇勪环`;
+
+  // Scan effect
+  const card = document.getElementById('reviewCard');
+  card.classList.remove('scanning');
+  void card.offsetWidth;
+  card.classList.add('scanning');
+
+  // Reset copy button
+  const btn = document.getElementById('copyBtn');
+  btn.classList.remove('copied');
+  document.querySelector('#copyBtn span').textContent = '涓€閿鍒?;
+}
+
+// ============================================================
+// 澶嶅埗鍔熻兘
+// ============================================================
+
+function copyReview() {
+  const text = document.getElementById('reviewText').textContent;
+  const btn = document.getElementById('copyBtn');
+  const btnText = document.querySelector('#copyBtn span');
+
+  // Scan animation
+  const card = document.getElementById('reviewCard');
+  card.classList.remove('scanning');
+  void card.offsetWidth;
+  card.classList.add('scanning');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showCopied()).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopied(); } catch(e) { showToast('澶嶅埗澶辫触锛岃闀挎寜鏂囧瓧鎵嬪姩澶嶅埗'); }
+  document.body.removeChild(ta);
+}
+
+function showCopied() {
+  const btn = document.getElementById('copyBtn');
+  const btnText = document.querySelector('#copyBtn span');
+  btn.classList.add('copied');
+  btnText.textContent = '鉁?宸插鍒讹紒鍘荤矘璐村惂';
+
+  showToast('澶嶅埗鎴愬姛锛佸幓绮樿创鍚?鉁?);
+  setTimeout(() => { btn.classList.remove('copied'); btnText.textContent = '涓€閿鍒?; }, 2500);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============================================================
+// Tab & Platform switching
+// ============================================================
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentStyle = tab.dataset.style;
+    generateReview();
+  });
+});
+
+document.querySelectorAll('.platform-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ============================================================
+// Init
+// ============================================================
+generateReview();
+</script>
+</body>
+</html>
